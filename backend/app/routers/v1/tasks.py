@@ -13,10 +13,9 @@ router = APIRouter()
 async def get_tasks(current_user: User = Depends(get_current_user)):
     print(f"Fetching tasks for user: {current_user.email} (ID: {current_user.id}, Role: {current_user.role})")
     if current_user.role == "admin":
-        tasks = await Task.find_all(fetch_links=True).to_list()
+        tasks = await Task.find_all().to_list()
     else:
-        # Try both owner.id and owner._id if needed, but owner.id is standard Beanie
-        tasks = await Task.find(Task.owner.id == current_user.id, fetch_links=True).to_list()
+        tasks = await Task.find(Task.owner.id == current_user.id).to_list()
         
     print(f"Found {len(tasks)} tasks")
     return [{"id": str(t.id), "owner_id": str(t.owner.id), **t.model_dump(exclude={"id", "owner"})} for t in tasks]
