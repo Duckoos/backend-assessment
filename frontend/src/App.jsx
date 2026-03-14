@@ -4,7 +4,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import AdminPage from './pages/AdminPage';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import DemoPage from './pages/DemoPage';
+import { LogOut, User as UserIcon, Layout as LayoutIcon } from 'lucide-react';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -30,6 +31,7 @@ const Layout = ({ children }) => {
                                 <h1 className="text-xl font-bold text-indigo-600">TaskFlow App</h1>
                                 <div className="ml-10 flex items-baseline space-x-4">
                                      <a href="/dashboard" className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md font-medium">Dashboard</a>
+                                     <a href="/demo" className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md font-medium">UI Demo</a>
                                      {user.role === 'admin' && (
                                          <a href="/admin" className="text-gray-900 hover:text-indigo-600 px-3 py-2 rounded-md font-medium">Admin Area</a>
                                      )}
@@ -78,6 +80,8 @@ function App() {
                             <AdminPage />
                         </ProtectedRoute>
                     } />
+                    
+                    <Route path="/demo" element={<DemoPage />} />
                     
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>

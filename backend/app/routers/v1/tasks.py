@@ -11,11 +11,14 @@ router = APIRouter()
 
 @router.get("", response_model=List[TaskResponse])
 async def get_tasks(current_user: User = Depends(get_current_user)):
+    print(f"Fetching tasks for user: {current_user.email} (ID: {current_user.id}, Role: {current_user.role})")
     if current_user.role == "admin":
         tasks = await Task.find_all(fetch_links=True).to_list()
     else:
+        # Try both owner.id and owner._id if needed, but owner.id is standard Beanie
         tasks = await Task.find(Task.owner.id == current_user.id, fetch_links=True).to_list()
         
+    print(f"Found {len(tasks)} tasks")
     return [{"id": str(t.id), "owner_id": str(t.owner.id), **t.model_dump(exclude={"id", "owner"})} for t in tasks]
 
 @router.get("/{task_id}", response_model=TaskResponse)
@@ -31,9 +34,11 @@ async def get_task(task_id: PydanticObjectId, current_user: User = Depends(get_c
 
 @router.post("", response_model=TaskResponse, status_code=status.HTTP_201_CREATED)
 async def create_task(task_data: TaskCreate, current_user: User = Depends(get_current_user)):
+    print(f"Creating task for user: {current_user.email} (ID: {current_user.id})")
     task_dict = task_data.model_dump()
     new_task = Task(**task_dict, owner=current_user)
     await new_task.insert()
+    print(f"Task created with ID: {new_task.id}")
     return {"id": str(new_task.id), "owner_id": str(current_user.id), **new_task.model_dump(exclude={"id", "owner"})}
 
 @router.put("/{task_id}", response_model=TaskResponse)
